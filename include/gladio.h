@@ -20,7 +20,7 @@
 
 #include "winlator.h"
 
-#ifdef __ANDROID__
+#if defined(__ANDROID__) && !defined(GLADIO_CLIENT)
 #define GL_SERVER 1
 #endif
 
