@@ -1,16 +1,16 @@
 <p align="center">
-	<img src="logo.png" width="376" height="128" alt="Gladio Logo" />
+	<img src="logo.png" width="376" height="188" alt="Gladio Logo" />
 </p>
 
 # Gladio
 
-Gladio is a library for Winlator that provides OpenGL support through the GLES host driver.
-This was created with a focus on increasing compatibility with older games that run on OpenGL,
-the compatibility with WineD3D is still quite limited, but some D3D9 games should run,
-This is the client for Gladio and the server performs various functions such as: 
+Gladio is a library for Winlator that provides OpenGL support through the GLES host driver.<br>
+This was created with a focus on increasing compatibility with older games that run on OpenGL,<br>
+the compatibility with WineD3D is still quite limited, but some D3D9 games should run.<br>
+This is the client for Gladio and the server performs various functions such as:<br>
 OpenGL 1.X emulation, shader conversion, texture decompression and more.
 
-# Games Tested
+# Games Tested (OpenGL)
 
 - RAGE (2011)
 - Wolfenstein The New Order
