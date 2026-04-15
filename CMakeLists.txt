@@ -17,3 +17,8 @@ add_library(GL SHARED
             src/ring_buffer.c
             src/gl_buffer.c
             src/gl_vao.c)
+
+if(ANDROID)
+    find_library(log-lib log)
+    target_link_libraries(GL ${log-lib} EGL GLESv3)
+endif()

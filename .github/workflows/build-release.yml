@@ -1,0 +1,80 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build-glibc:
+    name: Build (glibc / x86_64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y cmake build-essential
+
+      - name: Build
+        run: |
+          cmake -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build -j$(nproc)
+
+      - name: Package artifact
+        run: |
+          mkdir -p dist
+          cp build/libGL.so dist/libGL.so
+          tar -czf gladio-glibc-x86_64.tar.gz -C dist .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gladio-glibc-x86_64
+          path: gladio-glibc-x86_64.tar.gz
+
+  build-bionic:
+    name: Build (bionic / aarch64)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build with Android NDK
+        run: |
+          cmake -B build \
+            -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_HOME/build/cmake/android.toolchain.cmake \
+            -DANDROID_ABI=arm64-v8a \
+            -DANDROID_PLATFORM=android-24 \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build build -j$(nproc)
+
+      - name: Package artifact
+        run: |
+          mkdir -p dist
+          cp build/libGL.so dist/libGL.so
+          tar -czf gladio-bionic-aarch64.tar.gz -C dist .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gladio-bionic-aarch64
+          path: gladio-bionic-aarch64.tar.gz
+
+  release:
+    name: Create Release
+    needs: [build-glibc, build-bionic]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: false
+          body: |
+            Built by CI — see the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).
+          files: |
+            artifacts/gladio-glibc-x86_64/gladio-glibc-x86_64.tar.gz
+            artifacts/gladio-bionic-aarch64/gladio-bionic-aarch64.tar.gz
